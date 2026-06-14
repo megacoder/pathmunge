@@ -3,12 +3,33 @@
 # vim: ai sm noet nu nornu ts=8 sw=8 ff=unix filetype=zsh
 
 pathmunge() {
-	# Check if the array already contains the exact string $1
-	if [[ -z "${path[(r)$1]}" ]]; then
-		if [[ "$2" == "after" ]]; then
-		    path+=("$1")
-		else
-		    path=("$1" $path)
-		fi
-	fi
+    case "$1" in
+        "list" | "" )
+            local index=1
+            for dir in "${path[@]}"; do
+                printf "[%02d] %s\n" "$index" "$dir"
+                ((index++))
+            done
+            ;;
+
+        "rm" | "del" | "remove" | "delete" )
+            if [[ -z "$2" ]]; then
+                print "Error: Please specify a directory path to remove." >&2
+                return 1
+            fi
+            path=("${path[@]:#$2}")
+            ;;
+
+
+        *)
+            # Dedup
+		path=("${path[@]:#$1}")
+            # Standard addition behavior
+            if [[ "$2" == "after" ]]; then
+                path+=("$1")
+            else
+                path=("$1" $path)
+            fi
+            ;;
+    esac
 }
