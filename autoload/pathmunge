@@ -3,33 +3,40 @@
 # Do not try to execute this file standalone
 
 pathmunge() {
-    case "$1" in
-        "list" | "" )
-            local index=1
-            for dir in "${path[@]}"; do
-                printf "[%02d] %s\n" "$index" "$dir"
-                ((index++))
-            done
-            ;;
+	local	DIR
+	local	SPELLING
+	case "$1" in
+	"list" | "" )
+		local index=1
+		for DIR in "${path[@]}"; do
+			printf "[%02d] %s\n" "$index" "$DIR"
+			((index++))
+		done
+	;;
 
-        "rm" | "del" | "remove" | "delete" )
-            if [[ -z "$2" ]]; then
-                print "Error: Please specify a directory path to remove." >&2
-                return 1
-            fi
-            path=("${path[@]:#$2}")
-            ;;
+	"rm" | "del" | "remove" | "delete" )
+		if [[ -z "$2" ]]; then
+			print "Error: Please specify a directory path to remove." >&2
+			return 1
+		fi
+		path=("${path[@]:#$2}")
+	;;
 
 
-        *)
-            # Dedup
+	*)
+		# Directory must exist
+		SPELLING="${1}"
+		if [[ ! -d "${SPELLING}" ]]; then
+			print "Error: directoy must already exist and '${SPELLING}' does not." >&2
+		fi
+		# Dedup first
 		path=("${path[@]:#$1}")
-            # Standard addition behavior
-            if [[ "$2" == "after" ]]; then
-                path+=("$1")
-            else
-                path=("$1" $path)
-            fi
-            ;;
-    esac
+		# Standard addition behavior
+		if [[ "$2" == "after" ]]; then
+			path+=("${SPELLING}")
+		else
+			path=("${SPELLING}" $path)
+		fi
+	;;
+	esac
 }
