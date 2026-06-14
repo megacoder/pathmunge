@@ -1,0 +1,14 @@
+# This is intended to be sourced during zsh(1) startup.
+# Do not try to execute this file standalone
+# vim: ai sm noet nu nornu ts=8 sw=8 ff=unix filetype=zsh
+
+pathmunge() {
+	# Check if the array already contains the exact string $1
+	if [[ -z "${path[(r)$1]}" ]]; then
+		if [[ "$2" == "after" ]]; then
+		    path+=("$1")
+		else
+		    path=("$1" $path)
+		fi
+	fi
+}
